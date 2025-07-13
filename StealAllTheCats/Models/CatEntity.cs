@@ -23,6 +23,6 @@ namespace StealAllTheCats.Models
 
         public DateTime Created { get; set; }
 
-        public List<TagEntity> Tags { get; set; } = new();
+        public virtual List<TagEntity> Tags { get; set; } = new();
     }
 }

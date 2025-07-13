@@ -16,10 +16,8 @@ namespace StealAllTheCats.Repositories
                 .Include(c => c.Tags)
                 .FirstOrDefaultAsync(c => c.CatId == cat.CatId);
 
-            // Normalize incoming tags: match by Name, not just Id
             var incomingTagNames = cat.Tags.Select(t => t.Name.Trim()).Distinct().ToList();
 
-            // Fetch existing tags from DB by name
             var existingTagsInDb = await _context.Tags
                 .Where(t => incomingTagNames.Contains(t.Name))
                 .ToListAsync();
@@ -36,31 +34,28 @@ namespace StealAllTheCats.Repositories
                 }
                 else
                 {
-                    // Tag doesn't exist, so create new one
-                    tagsToAttach.Add(new TagEntity { Name = tagName });
+                    tagsToAttach.Add(new TagEntity { Name = tagName, Created = DateTime.Now });
                 }
             }
 
             if (existingCat == null)
             {
                 cat.Tags = tagsToAttach;
+                cat.Created = DateTime.Now;
                 _context.Cats.Add(cat);
             }
             else
             {
                 _context.Entry(existingCat).CurrentValues.SetValues(cat);
 
-                // Sync tags
                 var currentTagIds = existingCat.Tags.Select(t => t.Id).ToHashSet();
                 var updatedTagIds = tagsToAttach.Select(t => t.Id).ToHashSet();
 
-                // Add new tags
                 foreach (var tag in tagsToAttach.Where(t => !currentTagIds.Contains(t.Id)))
                 {
                     existingCat.Tags.Add(tag);
                 }
 
-                // Remove unselected tags
                 foreach (var tag in existingCat.Tags.Where(t => !updatedTagIds.Contains(t.Id)).ToList())
                 {
                     existingCat.Tags.Remove(tag);

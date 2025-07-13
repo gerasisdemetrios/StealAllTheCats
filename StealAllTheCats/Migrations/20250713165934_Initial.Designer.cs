@@ -12,7 +12,7 @@ using StealAllTheCats;
 namespace StealAllTheCats.Migrations
 {
     [DbContext(typeof(CatsDBContext))]
-    [Migration("20250713162044_Initial")]
+    [Migration("20250713165934_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -21,6 +21,9 @@ namespace StealAllTheCats.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.7")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);

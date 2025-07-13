@@ -34,5 +34,12 @@ namespace StealAllTheCats.Services
 
             return catEntities.ToList();
         }
+    
+        public async Task<CatEntity> GetCatById(int id)
+        {
+            var catEntity = await _catsRepository.GetByIdAsync(id);
+
+            return catEntity;
+        }
     }
 }
