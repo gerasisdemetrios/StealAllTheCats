@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StealAllTheCats.Models;
@@ -14,16 +15,21 @@ namespace StealAllTheCats.Controllers
     {
         private readonly ICatsService _catsService;
         private readonly IMapper _mapper;
-        public CatsController(ICatsService catsService, IMapper mapper)
+        private readonly IBackgroundJobClient _backgroundJobs;
+
+        public CatsController(ICatsService catsService, IMapper mapper, IBackgroundJobClient backgroundJobs)
         {
             _catsService = catsService;
             _mapper = mapper;
+            _backgroundJobs = backgroundJobs;
         }
 
         [HttpPost("fetch")]
-        public async Task Fetch()
+        public IActionResult Fetch()
         {
-            await _catsService.FetchCats();
+            string jobId = _backgroundJobs.Enqueue<ICatsService>(job => job.FetchCats());
+
+            return Accepted(new { jobId });
         }
 
         [HttpGet("{id}")]

@@ -1,3 +1,4 @@
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using StealAllTheCats;
@@ -17,6 +18,9 @@ builder.Services.AddScoped<IHttpClientService, HttpClientService>();
 builder.Services.AddScoped<ICatsService, CatsService>();
 builder.Services.AddScoped<ICatsRepository, CatsRepository>();
 builder.Services.AddAutoMapper(typeof(CatMappingProfile));
+builder.Services.AddHangfire(config =>
+    config.UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddHangfireServer();
 
 builder.Services.AddHttpClient<IHttpClientService, HttpClientService>(client =>
 {
