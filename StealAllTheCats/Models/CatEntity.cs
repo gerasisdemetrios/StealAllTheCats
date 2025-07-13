@@ -1,14 +1,19 @@
 ﻿using Azure;
+using StealAllTheCats.Models.Api;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace StealAllTheCats.Models
 {
     [Table("Cats")]
-    public class Cat
+    public class CatEntity
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public string CatId { get; set; }
+        public string CatId { get; set; } = string.Empty;
 
         public int Width { get; set; }
 
@@ -18,6 +23,6 @@ namespace StealAllTheCats.Models
 
         public DateTime Created { get; set; }
 
-        public List<Tag> Tags { get; } = [];
+        public List<TagEntity> Tags { get; set; } = new();
     }
 }

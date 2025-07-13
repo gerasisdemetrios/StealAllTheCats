@@ -43,7 +43,7 @@ namespace StealAllTheCats.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CatTag",
+                name: "CatTags",
                 columns: table => new
                 {
                     CatsId = table.Column<int>(type: "int", nullable: false),
@@ -51,15 +51,15 @@ namespace StealAllTheCats.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CatTag", x => new { x.CatsId, x.TagsId });
+                    table.PrimaryKey("PK_CatTags", x => new { x.CatsId, x.TagsId });
                     table.ForeignKey(
-                        name: "FK_CatTag_Cats_CatsId",
+                        name: "FK_CatTags_Cats_CatsId",
                         column: x => x.CatsId,
                         principalTable: "Cats",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CatTag_Tags_TagsId",
+                        name: "FK_CatTags_Tags_TagsId",
                         column: x => x.TagsId,
                         principalTable: "Tags",
                         principalColumn: "Id",
@@ -67,8 +67,8 @@ namespace StealAllTheCats.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CatTag_TagsId",
-                table: "CatTag",
+                name: "IX_CatTags_TagsId",
+                table: "CatTags",
                 column: "TagsId");
         }
 
@@ -76,7 +76,7 @@ namespace StealAllTheCats.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CatTag");
+                name: "CatTags");
 
             migrationBuilder.DropTable(
                 name: "Cats");
