@@ -12,7 +12,7 @@ using StealAllTheCats;
 namespace StealAllTheCats.Migrations
 {
     [DbContext(typeof(CatsDBContext))]
-    [Migration("20250713184056_Initial")]
+    [Migration("20250713201201_Initial")]
     partial class Initial
     {
         /// <inheritdoc />

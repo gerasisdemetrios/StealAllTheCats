@@ -52,11 +52,7 @@ namespace StealAllTheCats.Controllers
 
             var itemsDto = _mapper.Map<List<CatDto>>(items.ToList());
 
-            var totalCount = await _catsService.GetCatsCount();
-
-            var pagedItems = itemsDto
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize).ToList();   
+            var totalCount = await _catsService.GetCatsCount(); 
 
             var result = new
             {
@@ -64,7 +60,7 @@ namespace StealAllTheCats.Controllers
                 PageSize = pageSize,
                 TotalCount = totalCount,
                 TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
-                Items = pagedItems
+                Items = itemsDto
             };
 
             return Ok(result);

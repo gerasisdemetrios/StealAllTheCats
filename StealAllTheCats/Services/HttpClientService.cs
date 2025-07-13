@@ -14,7 +14,7 @@ namespace StealAllTheCats.Services
         }
         public async Task<List<CatApiModel>> FetchCatsAsync()
         {
-            var response = await _httpClient.GetAsync("/v1/images/search?limit=25");
+            var response = await _httpClient.GetAsync("/v1/images/search?limit=25&has_breeds=1");
 
             response.EnsureSuccessStatusCode();
 

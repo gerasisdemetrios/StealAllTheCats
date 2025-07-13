@@ -2,6 +2,7 @@ using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using StealAllTheCats;
+using StealAllTheCats.Middleware;
 using StealAllTheCats.Repositories;
 using StealAllTheCats.Repositories.Interfaces;
 using StealAllTheCats.Services;
@@ -25,10 +26,8 @@ builder.Services.AddHangfireServer();
 builder.Services.AddHttpClient<IHttpClientService, HttpClientService>(client =>
 {
     client.BaseAddress = new Uri("https://api.thecatapi.com");
-    client.DefaultRequestHeaders.Add("x-api-key", "live_XW9oh9nKLkr5LYX9sHS8J5LCg0G5C6Egqg2yMU6aYHM7g5A8GBYg5ZuVAeM7RIno");
+    client.DefaultRequestHeaders.Add("x-api-key", builder.Configuration.GetValue<string>("ApiKey"));
 });
-
-
 
 builder.Services.Configure<RouteOptions>(options =>
 {
@@ -48,6 +47,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseMiddleware<ErrorHandlingMiddleware>();
+
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -55,6 +56,12 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<CatsDBContext>();
+    await db.Database.MigrateAsync();
+}
 
 app.MapControllers();
 

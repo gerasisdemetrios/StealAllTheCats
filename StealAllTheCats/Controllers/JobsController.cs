@@ -24,7 +24,7 @@ namespace StealAllTheCats.Controllers
                 return NotFound(new { status = "NotFound" });
             }
 
-            var state = jobDetails.History?.FirstOrDefault()?.StateName ?? "Unknown";
+            var state = jobDetails.History?.OrderBy(x=> x.CreatedAt).Last()?.StateName ?? "Unknown";
 
             return Ok(new { jobId, status = state });
         }
