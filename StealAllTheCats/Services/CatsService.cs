@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using StealAllTheCats.Models;
 using StealAllTheCats.Repositories.Interfaces;
@@ -27,7 +28,7 @@ namespace StealAllTheCats.Services
             foreach (var cat in cats)
             {
                 CatEntity catEntity = _mapper.Map<CatEntity>(cat);
-                await _catsRepository.AddOrUpdateAsync(catEntity);
+                await _catsRepository.AddOrUpdate(catEntity);
             }
 
             var catEntities = await _catsRepository.GetAllAsync();
@@ -40,6 +41,18 @@ namespace StealAllTheCats.Services
             var catEntity = await _catsRepository.GetByIdAsync(id);
 
             return catEntity;
+        }
+
+        public async Task<IEnumerable<CatEntity>> GetAllPaged(int page = 1, int pageSize = 10, string? tag = null)
+        {
+            var pagedCats = await _catsRepository.GetAllPaged(page, pageSize, tag);
+
+            return pagedCats;
+        }
+
+        public async Task<int> GetCatsCount()
+        {
+            return await _catsRepository.GetCatsCount();
         }
     }
 }

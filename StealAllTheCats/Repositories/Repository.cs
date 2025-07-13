@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using StealAllTheCats.Repositories.Interfaces;
 using System.Linq.Expressions;
@@ -40,6 +41,16 @@ namespace StealAllTheCats.Repositories
         public async Task<T> GetByQueryAsync(Expression<Func<T, bool>> predicate)
         {
             return await _context.Set<T>().FirstOrDefaultAsync(predicate);
+        }
+
+        public async Task<IEnumerable<T>> GetAllByQueryAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _context.Set<T>().Where(predicate).ToListAsync();
+        }
+
+        public async Task<int> GetCatsCount()
+        {
+            return await _dbSet.CountAsync();
         }
 
         public async Task RemoveAsync(T entity)

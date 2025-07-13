@@ -10,7 +10,7 @@ namespace StealAllTheCats.Repositories
         {
         }
 
-        public async Task AddOrUpdateAsync(CatEntity cat)
+        public async Task AddOrUpdate(CatEntity cat)
         {
             var existingCat = await _context.Cats
                 .Include(c => c.Tags)
@@ -63,6 +63,27 @@ namespace StealAllTheCats.Repositories
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<CatEntity>> GetAllPaged(int page = 1, int pageSize = 10, string? tag = null)
+        {
+            var cats = Enumerable.Empty<CatEntity>();
+
+            if (tag == null || tag == string.Empty)
+            {
+                cats = await GetAllAsync();
+            }
+            else
+            {
+                cats = await GetAllByQueryAsync(c => c.Tags.Select(x => x.Name).Contains(tag));
+            }
+
+            var pagedCats = cats
+               .OrderBy(c => c.CatId)
+               .Skip((page - 1) * pageSize)
+               .Take(pageSize);
+
+            return pagedCats;
         }
     }
 }
