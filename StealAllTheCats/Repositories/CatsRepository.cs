@@ -12,11 +12,10 @@ namespace StealAllTheCats.Repositories
 
         public async Task AddOrUpdate(CatEntity cat)
         {
-            var existingCat = await _context.Cats
-                .Include(c => c.Tags)
-                .FirstOrDefaultAsync(c => c.CatId == cat.CatId);
-
-            var incomingTagNames = cat.Tags.Select(t => t.Name.Trim()).Distinct().ToList();
+            var incomingTagNames = cat.Tags
+                .Select(t => t.Name.Trim())
+                .Distinct()
+                .ToList();
 
             var existingTagsInDb = await _context.Tags
                 .Where(t => incomingTagNames.Contains(t.Name))
@@ -26,7 +25,8 @@ namespace StealAllTheCats.Repositories
 
             foreach (var tagName in incomingTagNames)
             {
-                var existing = existingTagsInDb.FirstOrDefault(t => t.Name == tagName);
+                var existing = existingTagsInDb
+                    .FirstOrDefault(t => t.Name.Trim().Replace(" ","").ToLower() == tagName.Replace(" ", "").ToLower());
 
                 if (existing != null)
                 {
@@ -34,32 +34,27 @@ namespace StealAllTheCats.Repositories
                 }
                 else
                 {
-                    tagsToAttach.Add(new TagEntity { Name = tagName, Created = DateTime.Now });
+                    tagsToAttach.Add(new TagEntity
+                    {
+                        Name = tagName,
+                        Created = DateTime.UtcNow
+                    });
                 }
             }
+
+            var existingCat = await _context.Cats
+                .Include(c => c.Tags)
+                .FirstOrDefaultAsync(c => c.CatId == cat.CatId);
 
             if (existingCat == null)
             {
                 cat.Tags = tagsToAttach;
-                cat.Created = DateTime.Now;
+                cat.Created = DateTime.UtcNow;
                 _context.Cats.Add(cat);
             }
             else
             {
-                _context.Entry(existingCat).CurrentValues.SetValues(cat);
-
-                var currentTagIds = existingCat.Tags.Select(t => t.Id).ToHashSet();
-                var updatedTagIds = tagsToAttach.Select(t => t.Id).ToHashSet();
-
-                foreach (var tag in tagsToAttach.Where(t => !currentTagIds.Contains(t.Id)))
-                {
-                    existingCat.Tags.Add(tag);
-                }
-
-                foreach (var tag in existingCat.Tags.Where(t => !updatedTagIds.Contains(t.Id)).ToList())
-                {
-                    existingCat.Tags.Remove(tag);
-                }
+                existingCat.Tags = tagsToAttach;
             }
 
             await _context.SaveChangesAsync();
